@@ -44,5 +44,6 @@ EXPOSE 80
 ENV NODE_ENV=production
 ENV PORT=80
 
-CMD ["bun", "run", "dist/index.js"]
+CMD ["bun", "run", "start"]
+
 

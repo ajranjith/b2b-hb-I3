@@ -7,17 +7,17 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-ajith}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-      POSTGRES_DB: ${POSTGRES_DB:-hb}
-      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD:-trust}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - hb-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ajith} -d ${POSTGRES_DB:-hb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,34 +33,31 @@ services:
     volumes:
       - ./search-engine/typesense-data:/data
     environment:
-      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY:-Hh873bbdS8044w1291}
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
       TYPESENSE_DATA_DIR: /data
       TYPESENSE_ENABLE_CORS: "true"
-    command: '--data-dir /data --api-key=${TYPESENSE_API_KEY:-Hh873bbdS8044w1291} --enable-cors'
+    command: '--data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors'
     networks:
       - hb-network
 
   # Backend API
   api:
     build:
-      context: ./api
+      context: ..
       dockerfile: Dockerfile
     container_name: hb-api
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "8080:80"
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-ajith}@postgres:5432/${POSTGRES_DB:-hb}?schema=public
+      NODE_ENV: ${NODE_ENV}
+      PORT: 80
+      DATABASE_URL: ${DATABASE_URL}
       TYPESENSE_HOST: typesense
       TYPESENSE_PORT: 8108
       TYPESENSE_PROTOCOL: http
-      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY:-Hh873bbdS8044w1291}
-      DOMAIN: ${DOMAIN:-localhost}
-    volumes:
-      # Mount for development (optional - remove in production)
-      - ./api/src:/app/src:ro
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
+      DOMAIN: ${DOMAIN}
     networks:
       - hb-network
     depends_on:
@@ -69,12 +66,11 @@ services:
       typesense:
         condition: service_started
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/v1/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-    command: sh -c "bunx prisma migrate deploy && bun run dist/index.js"
 
 networks:
   hb-network:

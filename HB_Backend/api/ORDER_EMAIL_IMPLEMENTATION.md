@@ -229,9 +229,9 @@ SMTP settings are configured in `.env`:
 SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=ajith@dgstechlimited.com
-SMTP_PASSWORD=mzkzscdbsvqvmhvc
-SMTP_FROM=ajith@dgstechlimited.com
+SMTP_USER=your-email@example.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM=your-email@example.com
 ```
 
 ## Error Handling
@@ -327,3 +327,4 @@ The order confirmation email system is now:
 - ✅ **Simple to extend** for other email types
 
 All order confirmations are now automatically sent to dealers with comprehensive logging!
+

@@ -345,19 +345,19 @@ LIMIT 5;
 
 **TypeSense Collections:**
 ```bash
-curl -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+curl -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   http://localhost:8108/collections
 ```
 
 **TypeSense Alias:**
 ```bash
-curl -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+curl -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   http://localhost:8108/aliases/products
 ```
 
 **Search Products:**
 ```bash
-curl -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+curl -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   "http://localhost:8108/collections/products/documents/search?q=*&query_by=code,name"
 ```
 
@@ -372,7 +372,7 @@ curl -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
 TYPESENSE_HOST=localhost
 TYPESENSE_PORT=8108
 TYPESENSE_PROTOCOL=http
-TYPESENSE_API_KEY=Hh873bbdS8044w1291
+TYPESENSE_API_KEY=your_typesense_api_key
 ```
 
 ### Tuning
@@ -418,21 +418,21 @@ Enable detailed logging:
 
 **List collections:**
 ```bash
-curl -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+curl -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   http://localhost:8108/collections
 ```
 
 **Delete old collection:**
 ```bash
 curl -X DELETE \
-  -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+  -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   http://localhost:8108/collections/products_1706423456
 ```
 
 **Update alias manually:**
 ```bash
 curl -X PUT \
-  -H "X-TYPESENSE-API-KEY: Hh873bbdS8044w1291" \
+  -H "X-TYPESENSE-API-KEY: YOUR_TYPESENSE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"collection_name":"products_1706423456"}' \
   http://localhost:8108/aliases/products
@@ -485,3 +485,5 @@ For issues or questions:
 - **Extra Cost**: $0 (fits within normal usage)
 
 **Zero Downtime**: Priceless ✅
+
+

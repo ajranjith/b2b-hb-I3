@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts",
+    "start": "bun run dist/index.js",
     "build": "bun build src/index.ts --outdir=dist --target=bun --minify",
     "db:generate": "bunx prisma generate",
     "db:migrate:dev": "bunx prisma migrate dev",
@@ -51,3 +51,4 @@
     "typescript": "^5.8.3"
   }
 }
+

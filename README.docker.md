@@ -32,8 +32,7 @@ curl -I http://localhost:8080/health
 .
 |-- Dockerfile
 |-- .dockerignore
-|-- .env.docker
+|-- .env.example
 |-- README.docker.md
 |-- HB_Backend/
 ```
-

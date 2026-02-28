@@ -21,12 +21,8 @@ tmp/
 .prisma/
 
 # Environment files
-.env
-.env.local
-.env.*.local
-.env.production
-.env.development
-.env.test
+.env*
+!.env.example
 
 # Database
 *.db
@@ -106,3 +102,4 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 
 *.azure*
+

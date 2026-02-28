@@ -28,7 +28,7 @@ docker run -p 8108:8108 \
   -v $(pwd)/typesense-data:/data \
   typesense/typesense:29.0 \
   --data-dir /data \
-  --api-key=Hh873bbdS8044w1291 \
+  --api-key=YOUR_TYPESENSE_API_KEY \
   --enable-cors
 ```
 
@@ -36,3 +36,4 @@ docker run -p 8108:8108 \
 
 For complete Docker setup documentation, see:
 - `/Users/ajith/Desktop/Projects/hb_backend/README.docker.md`
+

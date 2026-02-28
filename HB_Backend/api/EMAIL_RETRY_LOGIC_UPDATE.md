@@ -241,7 +241,7 @@ Use wrong password:
 
 ```typescript
 // In .env temporarily
-SMTP_PASSWORD=wrong-password
+SMTP_PASSWORD=example-app-password
 
 // Should fail immediately without retry
 ```
@@ -254,7 +254,7 @@ Use correct configuration:
 // In .env
 SMTP_HOST=smtp.office365.com
 SMTP_USER=your-email@domain.com
-SMTP_PASSWORD=correct-password
+SMTP_PASSWORD=example-app-password
 
 // Should succeed on first attempt
 ```
@@ -301,3 +301,4 @@ ORDER BY "createdAt" DESC;
 ✅ **Configurable:** Easy to adjust retry behavior
 
 **Result:** More reliable email delivery with better error handling!
+

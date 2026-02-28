@@ -62,10 +62,10 @@ Access the services:
 Copy the environment template and update with production values:
 
 ```bash
-cp .env.docker .env.docker.local
+cp ../.env.example .env.local
 ```
 
-Edit `.env.docker.local`:
+Edit `.env.local`:
 
 ```env
 # Production Configuration
@@ -74,7 +74,7 @@ DOMAIN=api.yourdomain.com
 
 # PostgreSQL - Use strong passwords!
 POSTGRES_USER=hb_production_user
-POSTGRES_PASSWORD=your_secure_database_password
+POSTGRES_PASSWORD=<REPLACE_ME>
 POSTGRES_DB=hb_production
 
 # Typesense - Generate a secure API key
@@ -85,7 +85,7 @@ TYPESENSE_API_KEY=your_secure_typesense_api_key
 
 ```bash
 # Build with production environment
-docker-compose --env-file .env.docker.local up -d --build
+docker-compose --env-file .env.local up -d --build
 
 # Check service health
 docker-compose ps
@@ -247,7 +247,7 @@ docker-compose exec api bun run script-name
 
 ### 1. Environment Variables
 
-Never commit `.env.docker.local` to version control. Use secure, randomly generated passwords:
+Never commit `.env.local` to version control. Use secure, randomly generated passwords:
 
 ```bash
 # Generate secure password
@@ -351,7 +351,7 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          docker-compose --env-file .env.docker.local up -d --build
+          docker-compose --env-file .env.local up -d --build
 
       - name: Run Migrations
         run: |
@@ -374,7 +374,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - docker-compose --env-file .env.docker.local up -d --build
+    - docker-compose --env-file .env.local up -d --build
     - docker-compose exec -T api bunx prisma migrate deploy
 ```
 
@@ -428,7 +428,7 @@ docker-compose ps postgres
 docker-compose exec postgres pg_isready -U hb_user
 
 # Test connection from API container
-docker-compose exec api psql postgresql://hb_user:hb_password@postgres:5432/hb_backend
+docker-compose exec api psql postgresql://<USER>:<PASSWORD>@postgres:5432/<DB_NAME>
 ```
 
 ### Typesense Issues
@@ -477,23 +477,17 @@ docker-compose up -d --build
 ## File Structure
 
 ```
-hb_backend/
-├── docker-compose.yml         # Main orchestration file (ALL services)
-├── .env.docker               # Environment template
-├── .env.docker.local         # Local/production config (gitignored)
-├── README.docker.md          # This file
-├── api/
-│   ├── Dockerfile            # API container definition
-│   ├── .dockerignore         # Files to exclude from build
-│   ├── package.json
-│   ├── prisma/
-│   │   ├── schema.prisma     # Database schema
-│   │   ├── migrations/       # Database migrations
-│   │   └── seed.ts           # Seed data
-│   └── src/                  # API source code
-└── search-engine/
-    ├── typesense-data/       # Persistent search data (volume mount)
-    └── README.md             # Typesense data directory info
+HB_Backend/
++-- docker-compose.yml         # Main orchestration file (all services)
++-- .env.local                 # Local/production config (gitignored)
++-- README.docker.md           # This file
++-- api/
+�   +-- .dockerignore
+�   +-- package.json
+�   +-- prisma/
+�   +-- src/
+�   +-- tsconfig.json
++-- search-engine/
 ```
 
 ## Performance Tuning
@@ -539,3 +533,9 @@ For issues or questions:
 - [Prisma Documentation](https://www.prisma.io/docs/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Typesense Documentation](https://typesense.org/docs/)
+
+
+
+
+
+

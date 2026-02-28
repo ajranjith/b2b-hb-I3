@@ -11,6 +11,10 @@ import { scheduledImportsService } from './services/scheduledImports';
 // Load environment variables
 config();
 
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
+
 const app = new Hono();
 const port = parseInt(process.env.PORT || '3000', 10);
 
@@ -89,3 +93,5 @@ const shutdown = (signal: string) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
+

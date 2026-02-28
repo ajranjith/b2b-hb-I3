@@ -3,6 +3,12 @@ import Typesense from 'typesense';
 /**
  * TypeSense client for search functionality
  */
+const typesenseApiKey = process.env.TYPESENSE_API_KEY;
+
+if (!typesenseApiKey) {
+  throw new Error('TYPESENSE_API_KEY is not set');
+}
+
 export const typesenseClient = new Typesense.Client({
   nodes: [
     {
@@ -11,7 +17,7 @@ export const typesenseClient = new Typesense.Client({
       protocol: process.env.TYPESENSE_PROTOCOL || 'http',
     },
   ],
-  apiKey: process.env.TYPESENSE_API_KEY || 'Hh873bbdS8044w1291',
+  apiKey: typesenseApiKey,
   connectionTimeoutSeconds: 10,
 });
 
