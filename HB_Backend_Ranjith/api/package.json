@@ -1,0 +1,53 @@
+{
+  "name": "hb-backend-api",
+  "version": "1.0.0",
+  "description": "HB Backend API Service",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir=dist --target=bun --minify",
+    "db:generate": "bunx prisma generate",
+    "db:migrate:dev": "bunx prisma migrate dev",
+    "db:migrate:deploy": "bunx prisma migrate deploy",
+    "db:studio": "bunx prisma studio",
+    "db:push": "bunx prisma db push",
+    "db:seed": "bun run prisma/seed.ts",
+    "db:sync-typesense": "bun run src/scripts/syncTypesense.ts",
+    "test:email": "bun run src/scripts/testEmail.ts",
+    "test:smtp": "bun run src/scripts/testSMTPAuth.ts",
+    "script:upload-images": "bun run src/scripts/uploadProductImages.ts",
+    "sharepoint:get-folder-id": "bun run scripts/getSharePointFolderId.ts"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.0",
+    "@azure/storage-blob": "^12.30.0",
+    "@hono/zod-validator": "^0.4.3",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@prisma/adapter-pg": "^6.8.2",
+    "@prisma/client": "^6.8.2",
+    "@scalar/hono-api-reference": "^0.5.175",
+    "dayjs": "^1.11.19",
+    "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
+    "hono": "^4.7.10",
+    "hono-openapi": "^0.4.8",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.13",
+    "pg": "^8.16.3",
+    "typesense": "^2.1.0",
+    "zod": "^3.25.0",
+    "zod-openapi": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.14",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.14",
+    "@types/pg": "^8.15.2",
+    "prisma": "^6.8.2",
+    "typescript": "^5.8.3"
+  }
+}

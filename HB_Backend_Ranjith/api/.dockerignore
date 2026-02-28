@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+bun.lock
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist
+build
+
+# Development files
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Testing
+coverage
+.nyc_output
+test-*.js
+test-*.html
+
+# Documentation
+*.md
+!README.md
+
+# Prisma
+generated
+.env
+prisma/*.db
+prisma/*.db-journal
+
+# Misc
+.editorconfig
+.prettierrc
+.eslintrc

@@ -1,0 +1,633 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserRole {
+  id Int @id @default(autoincrement())
+  code Role @unique
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+  users User[]
+}
+
+enum Role {
+  Admin
+  Dealer
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  email     String   @unique
+  password  String
+  roleId    Int
+  role      UserRole @relation(fields: [roleId], references: [id])
+  profileImage String?
+  isTempPassword Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+  isLocked Boolean @default(false)
+  dealer UserDealer?
+
+
+  sessions UserSession[]
+  passwordResetTokens PasswordResetToken[]
+  importLogs ImportLog[]
+  carts Cart[]
+  cartItemTransactions CartItemTransaction[]
+  orders Order[]
+  orderStatusHistory OrderStatusHistory[]
+}
+
+model UserDealer {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  accountNumber Int @unique
+  companyName String
+  genuinePartsTier DealerTier
+  aftermarketESTier DealerTier
+  aftermarketBTier DealerTier
+  accountStatus DealerAccountStatus
+  defaultShippingMethodId Int?
+  defaultShippingMethod ShippingMethod? @relation(fields: [defaultShippingMethodId], references: [id])
+  notes String?
+  isTemporaryUser Boolean @default(true)
+  failedLoginAttempts Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+enum DealerAccountStatus {
+  Active
+  Inactive
+  Suspended
+}
+
+enum DealerTier {
+  Net1
+  Net2
+  Net3
+  Net4
+  Net5
+  Net6
+  Net7
+}
+
+enum NewsOffersType {
+  News
+  Offers
+  PriceList
+}
+
+enum BannerType {
+  Horizontal
+  Vertical
+}
+
+model UserSession {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  token String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model ShippingMethod {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  orders Order[]
+  userDealers UserDealer[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  code String @unique
+  name String
+  type ProductType
+  supplierCode String?
+  height Decimal?
+  length Decimal?
+  width Decimal?
+  weight Decimal?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  prices ProductPrice[]
+  stocks ProductStock[]
+  cartItems CartItem[]
+  orderItems OrderItem[]
+
+  @@index([code])
+  @@index([supplierCode])
+}
+
+enum ProductType {
+  Aftermarket
+  Genuine
+  Branded
+}
+
+model ProductPrice {
+  id Int @id @default(autoincrement())
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  currency String @default("GBP")
+  net1 Decimal @default(0)
+  net2 Decimal @default(0)
+  net3 Decimal @default(0)
+  net4 Decimal @default(0)
+  net5 Decimal @default(0)
+  net6 Decimal @default(0)
+  net7 Decimal @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model ProductStock {
+  id Int @id @default(autoincrement())
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  stock Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model ProductSupersededMapping {
+  id              Int      @id @default(autoincrement())
+  productCode     String
+  supersededBy    String   // The product code that supersedes this one
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          Boolean  @default(true)
+
+  @@unique([productCode, supersededBy])
+}
+
+enum ImportSource {
+  MANUAL
+  SHAREPOINT
+}
+
+enum SharePointImportRunStatus {
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
+enum SharePointImportTrigger {
+  CRON
+  MANUAL
+}
+
+model ImportLog {
+  id Int @id @default(autoincrement())
+  type ImportType
+  importStatus ImportStatus @default(PENDING)
+  importSource ImportSource @default(MANUAL) // MANUAL or SHAREPOINT
+  fileName String
+  fileSize Int
+  fileUrl String? // Azure blob storage URL for the imported file
+  sharePointFileId String? // SharePoint file ID (to track processed files)
+  sharePointFileModifiedDate DateTime? // SharePoint file last modified date
+  totalRows Int @default(0)
+  successCount Int @default(0)
+  errorCount Int @default(0)
+  importedBy Int?
+  importedByUser User? @relation(fields: [importedBy], references: [id])
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  durationMs Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+  errors ImportErrorsLog[]
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([sharePointFileId])
+  @@index([importSource])
+}
+
+model ImportErrorsLog {
+  id Int @id @default(autoincrement())
+  importLogId Int
+  importLog ImportLog @relation(fields: [importLogId], references: [id], onDelete: Cascade)
+  rowNumber Int
+  rowData Json
+  errors String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  @@index([importLogId])
+}
+
+enum ImportType {
+  PARTS
+  DEALERS
+  SUPERSEDED
+  BACKORDER
+  ORDER_STATUS
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model SyncLog {
+  id Int @id @default(autoincrement())
+  type String
+  totalRecords Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+// Cart Models
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  status    CartStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+}
+
+enum CartStatus {
+  ACTIVE      // Active shopping cart (only one per user)
+  CONVERTED   // Cart was converted to order
+  EXPIRED     // Cart expired/abandoned
+}
+
+model CartItem {
+  id          Int      @id @default(autoincrement())
+  cartId      Int
+  productId   Int
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cart         Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  transactions CartItemTransaction[]
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+}
+
+model CartItemTransaction {
+  id          Int      @id @default(autoincrement())
+  cartItemId  Int
+  action      CartItemAction
+  oldQuantity Int?
+  newQuantity Int?
+  userId      Int      // Who made the change
+  createdAt   DateTime @default(now())
+
+  cartItem    CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([cartItemId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+enum CartItemAction {
+  ADDED
+  QUANTITY_INCREASED
+  QUANTITY_DECREASED
+  REMOVED
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  orderNumber String @unique
+  billingOrderNo String?
+  k8OrderNo String?
+  orderDate DateTime @default(now())
+  totalAmount Decimal
+  shippingMethodId Int
+  shippingMethod ShippingMethod @relation(fields: [shippingMethodId], references: [id])
+  notes String?
+  billingFirstName String
+  billingLastName String
+  billingEmail String
+  billingCompanyName String?
+  orderStatus OrderStatus @default(PROCESSING)
+  uploadedToSharePoint Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  items OrderItem[]
+  statusHistory OrderStatusHistory[]
+  statusLogs OrderStatusLog[]
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([orderStatus])
+  @@index([orderDate])
+}
+
+enum OrderStatus {
+  BACKORDER
+  PICKING
+  PACKING
+  OUT_FOR_DELIVERY
+  PROCESSING
+}
+
+// Order Items with Price Snapshot
+model OrderItem {
+  id Int @id @default(autoincrement())
+  orderId Int
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Line number for order item
+  lineNumber Int
+
+  // Product Reference
+  productId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productCode String // Snapshot: product code at time of order
+
+  // Quantity
+  quantity Int
+
+  // Price Snapshot (locked at checkout)
+  productName String // Snapshot: product name
+  productType ProductType // Snapshot: product type
+  unitPrice Decimal // Price per unit based on dealer tier
+  subtotal Decimal // unitPrice * quantity
+  dealerTier DealerTier // Which tier was used (Net1, Net2, etc)
+  currency String @default("GBP")
+
+  // Stock snapshot
+  stockAtOrder Int? // Stock level at time of order
+
+  // Back order details
+  qtyOrdered Int? // Quantity Ordered (Q Ord)
+  qtyOutstanding Int? // Quantity Outstanding (Q/O) - previously qtyWithheld
+  inWarehouse Int? // In Warehouse (In WH) - previously qtyAvailable
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  backOrders BackOrderLogs[]
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([productCode])
+
+}
+
+model BackOrderLogs {
+  id Int @id @default(autoincrement())
+  orderItemId Int
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  qtyOrdered Int // Quantity Ordered (Q Ord)
+  qtyOutstanding Int // Quantity Outstanding (Q/O) - previously qtyWithheld
+  inWarehouse Int // In Warehouse (In WH) - previously qtyAvailable
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+
+model OrderStatusHistory {
+  id Int @id @default(autoincrement())
+  orderId Int
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  oldStatus OrderStatus?
+  newStatus OrderStatus
+
+  // Who changed it (admin/system)
+  changedBy Int?
+  changedByUser User? @relation(fields: [changedBy], references: [id])
+
+  notes String? // Optional notes about the change
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([createdAt])
+  @@index([newStatus])
+}
+
+model OrderStatusLog {
+  id Int @id @default(autoincrement())
+  orderId Int
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  k8OrderNo String?
+  orderStatus OrderStatus
+  notes String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Banner {
+  id Int @id @default(autoincrement())
+  type BannerType @default(Horizontal)
+  title String
+  description String
+  imgae String
+  link String?
+  orderNo Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model NewsOffers {
+  id Int @id @default(autoincrement())
+  type NewsOffersType
+  title String
+  description String?
+  longDescription String?
+  thumbnail String
+  fileUpload String?
+  subtext String?
+  orderNo Int?
+  fromDate DateTime
+  toDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model ExternalLinks {
+  id Int @id @default(autoincrement())
+  image String
+  title String
+  link String
+  orderNo Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model Marquee {
+  id Int @id @default(autoincrement())
+  text String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+
+model EmailLog {
+  id Int @id @default(autoincrement())
+  type EmailType
+  recipient String
+  subject String
+  emailStatus EmailStatus @default(PENDING)
+  errorMessage String?
+  relatedOrderId Int?
+  relatedUserId Int?
+  metadata Json?
+  sentAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([emailStatus])
+  @@index([recipient])
+  @@index([relatedOrderId])
+  @@index([createdAt])
+}
+
+enum EmailType {
+  ORDER_CONFIRMATION
+  ORDER_STATUS_UPDATE
+  WELCOME
+  PASSWORD_RESET
+  ADMIN_NOTIFICATION
+  INVOICE
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model ContactInquiry {
+  id Int @id @default(autoincrement())
+  name String
+  email String
+  phone String
+  message String @db.Text
+  notes String? @db.Text
+  respondedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model ExclusiveParts {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  imgae String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+}
+
+model ProductImages {
+  id Int @id @default(autoincrement())
+  productCode String
+  image String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status Boolean @default(true)
+
+  @@index([productCode])
+}
+
+model SharePointImportRun {
+  id Int @id @default(autoincrement())
+  triggeredBy SharePointImportTrigger // CRON or MANUAL
+  status SharePointImportRunStatus @default(SUCCESS) // SUCCESS, PARTIAL, FAILED
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  durationMs Int?
+  // Summary counts
+  totalFilesFound Int @default(0)
+  totalFilesProcessed Int @default(0)
+  totalFilesSkipped Int @default(0)
+  totalFilesFailed Int @default(0)
+  // Detailed results per import type (JSON)
+  // Format: { "PARTS": { "found": 2, "processed": 2, "skipped": 0, "failed": 0 }, ... }
+  results Json?
+  // Any errors encountered
+  errors Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([triggeredBy])
+  @@index([status])
+  @@index([startedAt])
+}

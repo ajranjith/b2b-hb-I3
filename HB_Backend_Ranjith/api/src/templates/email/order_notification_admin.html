@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>New Order Received</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <style>
+        body, td, p, a, h1, h2, span { font-family: 'DM Sans', sans-serif !important; }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: 'DM Sans', sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 800px; background-color: #ffffff;">
+
+                    <!-- Logo -->
+                    <tr>
+                        <td align="center" style="padding: 32px 24px 24px;">
+                            <img src="https://hotdray.blob.core.windows.net/dev/259a4572-831d-406f-afed-43047216d528.png?sv=2026-02-06&st=2026-02-10T06%3A01%3A54Z&se=2027-02-10T06%3A01%3A54Z&sr=b&sp=r&sig=iV1UKSpI4zEB2X0PFUddLbsZQIQ1RP8dND8ZdflcD9E%3D" alt="HOTBRAY Logo" style="max-width: 160px; height: auto; display: block;" />
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 0 32px 32px;">
+
+                            <!-- Notification Message -->
+                            <p style="margin: 0 0 32px 0; font-size: 16px; color: #000000; font-family: 'DM Sans', sans-serif;">A new order has been received.</p>
+
+                            <!-- Top Info Bar -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px; border: 1px solid #e0e0e0;">
+                                <tr>
+                                    <td width="25%" style="padding: 16px; border-right: 1px solid #e0e0e0; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-size: 11px; color: #999999; text-transform: uppercase; font-family: 'DM Sans', sans-serif;">ORDER NUMBER:</p>
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">{{orderNumber}}</p>
+                                    </td>
+                                    <td width="25%" style="padding: 16px; border-right: 1px solid #e0e0e0; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-size: 11px; color: #999999; text-transform: uppercase; font-family: 'DM Sans', sans-serif;">DATE:</p>
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">{{orderDate}}</p>
+                                    </td>
+                                    <td width="25%" style="padding: 16px; border-right: 1px solid #e0e0e0; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-size: 11px; color: #999999; text-transform: uppercase; font-family: 'DM Sans', sans-serif;">EMAIL:</p>
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">{{email}}</p>
+                                    </td>
+                                    <td width="25%" style="padding: 16px; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-size: 11px; color: #999999; text-transform: uppercase; font-family: 'DM Sans', sans-serif;">TOTAL:</p>
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">{{total}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Order Details -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td colspan="2" style="padding: 16px; background-color: #f8f8f8; border: 1px solid #e0e0e0; border-bottom: none;">
+                                        <p style="margin: 0; font-size: 16px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">Order details</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Product</p>
+                                    </td>
+                                    <td align="right" style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-left: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Total</p>
+                                    </td>
+                                </tr>
+                                <!-- PRODUCT_ROWS_PLACEHOLDER -->
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{productCode}} × {{quantity}}</p>
+                                    </td>
+                                    <td align="right" style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-left: none; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{itemTotal}}</p>
+                                    </td>
+                                </tr>
+                                <!-- END_PRODUCT_ROWS_PLACEHOLDER -->
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Subtotal:</p>
+                                    </td>
+                                    <td align="right" style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-left: none; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{subtotal}}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Total:</p>
+                                    </td>
+                                    <td align="right" style="padding: 12px 16px; border: 1px solid #e0e0e0; border-left: none; border-top: none;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{total}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Additional Info -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; background-color: #f8f8f8;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Order Number:</p>
+                                    </td>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-left: none; background-color: #ffffff;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{dealerOrderNumber}}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-top: none; background-color: #f8f8f8;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Method of dispatch option:</p>
+                                    </td>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-bottom: none; border-left: none; border-top: none; background-color: #ffffff;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{dispatchMethod}}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-top: none; background-color: #f8f8f8;">
+                                        <p style="margin: 0; font-size: 14px; color: #999999; font-family: 'DM Sans', sans-serif;">Order Notes:</p>
+                                    </td>
+                                    <td style="padding: 12px 16px; border: 1px solid #e0e0e0; border-left: none; border-top: none; background-color: #ffffff;">
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{orderNotes}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Billing Address -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px;">
+                                <tr>
+                                    <td style="padding: 16px; background-color: #f8f8f8; border: 1px solid #e0e0e0; border-bottom: none;">
+                                        <p style="margin: 0; font-size: 16px; color: #000000; font-weight: 500; font-family: 'DM Sans', sans-serif;">Billing address</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px; border: 1px solid #e0e0e0; border-top: none;">
+                                        <p style="margin: 0 0 4px 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{billingName}}</p>
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">{{billingCompany}}</p>
+                                        <p style="margin: 0; font-size: 14px; color: #000000; font-family: 'DM Sans', sans-serif;">✉ {{billingEmail}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding: 32px 24px; background-color: #fafafa; border-top: 1px solid #e5e5e5;">
+                            <p style="margin: 0 0 16px 0; font-size: 13px; color: #666666; line-height: 1.5;">
+                                © {{year}} Hotbray.<br/>All Rights Reserved.
+                            </p>
+                            <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="padding: 0 8px;">
+                                        <a href="https://hotbray.com/terms" style="text-decoration: none; color: #666666; font-size: 13px;">
+                                            Terms & Conditions
+                                        </a>
+                                    </td>
+                                    <td style="color: #999999; font-size: 13px;">|</td>
+                                    <td style="padding: 0 8px;">
+                                        <a href="https://hotbray.com/privacy" style="text-decoration: none; color: #666666; font-size: 13px;">
+                                            Privacy Policy
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealer Import Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="file"]:hover {
+            border-color: #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dealer Import Test</h1>
+        <p class="description">
+            Use this form to test the dealer import API. Make sure you're logged in first.
+        </p>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="fileInput">Select Excel File (XLSX, XLS, or CSV)</label>
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" required>
+            </div>
+
+            <button type="submit" id="submitBtn">Upload and Import</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <p>⏳ Uploading and processing file...</p>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                showResult('error', 'Please select a file');
+                return;
+            }
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/v1/import/dealers', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include', // Include cookies (auth token)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult('success', `
+                        <strong>✅ Import Successful!</strong><br><br>
+                        <strong>Import Log ID:</strong> ${data.data.importLogId}<br>
+                        <strong>Total Rows:</strong> ${data.data.totalRows}<br>
+                        <strong>Success:</strong> ${data.data.successCount}<br>
+                        <strong>Errors:</strong> ${data.data.errorCount}<br>
+                        <strong>Duration:</strong> ${data.data.durationMs}ms<br><br>
+                        ${data.data.errorCount > 0 ? `
+                            <strong>Error Details:</strong>
+                            <pre>${JSON.stringify(data.data.errors, null, 2)}</pre>
+                        ` : ''}
+                    `);
+                } else {
+                    showResult('error', `
+                        <strong>❌ Import Failed</strong><br><br>
+                        <strong>Status:</strong> ${response.status}<br>
+                        <strong>Error:</strong> ${data.errors?.join(', ') || data.message || 'Unknown error'}<br><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `);
+                }
+            } catch (error) {
+                showResult('error', `
+                    <strong>❌ Request Failed</strong><br><br>
+                    <strong>Error:</strong> ${error.message}<br><br>
+                    Make sure the server is running and you're logged in.
+                `);
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function showResult(type, html) {
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
