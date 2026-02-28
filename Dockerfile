@@ -4,13 +4,13 @@ FROM oven/bun:1-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY HB_Backend_Ranjith/api/package.json HB_Backend_Ranjith/api/bun.lock* ./
+COPY HB_Backend/api/package.json HB_Backend/api/bun.lock* ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy source code
-COPY HB_Backend_Ranjith/api/ ./
+COPY HB_Backend/api/ ./
 
 # Generate Prisma client
 RUN bunx prisma generate
@@ -45,3 +45,4 @@ ENV NODE_ENV=production
 ENV PORT=80
 
 CMD ["bun", "run", "dist/index.js"]
+

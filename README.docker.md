@@ -34,5 +34,6 @@ curl -I http://localhost:8080/health
 |-- .dockerignore
 |-- .env.docker
 |-- README.docker.md
-|-- HB_Backend_Ranjith/
+|-- HB_Backend/
 ```
+
