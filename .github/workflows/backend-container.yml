@@ -28,8 +28,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Login to ACR
-        run: az acr login --name ${{ secrets.AZURE_ACR_NAME }}
+      - name: Login to ACR (OIDC token)
+        run: |
+          TOKEN=$(az acr login \
+            --name ${{ secrets.AZURE_ACR_NAME }} \
+            --expose-token \
+            --output tsv \
+            --query accessToken)
+
+          echo $TOKEN | docker login \
+            ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
+            --username 00000000-0000-0000-0000-000000000000 \
+            --password-stdin
 
       - name: Build and Push Image
         run: |
@@ -49,3 +59,4 @@ jobs:
 
       - name: Restart App Service
         run: az webapp restart --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_WEBAPP_NAME }}
+
