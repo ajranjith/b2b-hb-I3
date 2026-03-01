@@ -1,9 +1,12 @@
-name: Build and Deploy Backend Container
+name: Backend Build, Test, and Deploy
 
 on:
   push:
     branches:
       - main
+    paths:
+      - "HB_Backend/**"
+      - "Dockerfile"
   workflow_dispatch:
 
 permissions:
@@ -12,14 +15,33 @@ permissions:
 
 env:
   IMAGE_NAME: hb-backend
+  ACR_LOGIN_SERVER: hb1b2bdevacr.azurecr.io
+  ACR_NAME: hb1b2bdevacr
+  RESOURCE_GROUP: rg1-hb1-b2b-dev
+  WEBAPP_NAME: hb1-b2b-dev-backend
 
 jobs:
-  build-and-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Backend Dependencies
+        working-directory: HB_Backend/api
+        run: bun install --frozen-lockfile
+
+      - name: Backend Tests (Prisma Validate)
+        working-directory: HB_Backend/api
+        run: bunx prisma validate
+
+      - name: Build Backend
+        working-directory: HB_Backend/api
+        run: bun run build
 
       - name: Azure Login (OIDC)
         uses: azure/login@v2
@@ -31,32 +53,40 @@ jobs:
       - name: Login to ACR (OIDC token)
         run: |
           TOKEN=$(az acr login \
-            --name ${{ secrets.AZURE_ACR_NAME }} \
+            --name ${{ env.ACR_NAME }} \
             --expose-token \
             --output tsv \
             --query accessToken)
 
           echo $TOKEN | docker login \
-            ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
+            ${{ env.ACR_LOGIN_SERVER }} \
             --username 00000000-0000-0000-0000-000000000000 \
             --password-stdin
 
       - name: Build and Push Image
         run: |
           IMAGE_TAG=${{ github.sha }}
-          IMAGE=${{ secrets.AZURE_ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}
+          IMAGE=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}
           docker build -t ${IMAGE}:${IMAGE_TAG} -t ${IMAGE}:latest .
           docker push ${IMAGE}:${IMAGE_TAG}
           docker push ${IMAGE}:latest
 
+      - name: Enable Managed Identity Pull
+        run: |
+          az webapp config set \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.WEBAPP_NAME }} \
+            --generic-configurations '{"acrUseManagedIdentityCreds": true}'
+
       - name: Update App Service Container
         run: |
-          IMAGE=${{ secrets.AZURE_ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          IMAGE=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           az webapp config container set \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-            --docker-custom-image-name ${IMAGE}
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.WEBAPP_NAME }} \
+            --container-image-name ${IMAGE} \
+            --container-registry-url https://${{ env.ACR_LOGIN_SERVER }} \
+            --enable-app-service-storage false
 
       - name: Restart App Service
-        run: az webapp restart --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_WEBAPP_NAME }}
-
+        run: az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.WEBAPP_NAME }}
