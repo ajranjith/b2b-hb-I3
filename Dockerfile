@@ -41,7 +41,7 @@ USER nodejs
 
 EXPOSE 80
 
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV PORT=80
 
 CMD ["bun", "run", "start"]
