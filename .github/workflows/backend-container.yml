@@ -37,6 +37,8 @@ jobs:
 
       - name: Backend Tests (Prisma Validate)
         working-directory: HB_Backend/api
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
         run: bunx prisma validate
 
       - name: Build Backend
@@ -90,3 +92,4 @@ jobs:
 
       - name: Restart App Service
         run: az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.WEBAPP_NAME }}
+
