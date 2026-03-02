@@ -39,12 +39,13 @@ RUN chown -R nodejs:nodejs /app
 
 USER nodejs
 
-EXPOSE 3000
+EXPOSE 8181
 
 ENV NODE_ENV=development
-ENV PORT=3000
+ENV PORT=8181
 
 CMD ["bun", "run", "start"]
+
 
 
 
