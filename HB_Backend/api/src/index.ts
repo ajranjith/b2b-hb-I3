@@ -1,3 +1,6 @@
+console.log("Bun server starting...");
+console.log("PORT =", process.env.PORT);
+
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
@@ -93,6 +96,8 @@ const shutdown = (signal: string) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
+
 
 
 
