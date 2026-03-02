@@ -1,11 +1,7 @@
 name: Backend Build, Test, and Deploy
 
 on:
-  workflow_run:
-    workflows:
-      - "Backend Migrations"
-    types:
-      - completed
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -20,14 +16,11 @@ env:
 
 jobs:
   build-test-deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -68,7 +61,7 @@ jobs:
 
       - name: Build and Push Image
         run: |
-          IMAGE_TAG=${{ github.event.workflow_run.head_sha }}
+          IMAGE_TAG=${{ github.sha }}
           IMAGE=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}
           docker build -t ${IMAGE}:${IMAGE_TAG} -t ${IMAGE}:latest .
           docker push ${IMAGE}:${IMAGE_TAG}
@@ -83,7 +76,7 @@ jobs:
 
       - name: Update App Service Container
         run: |
-          IMAGE=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+          IMAGE=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           az webapp config container set \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.WEBAPP_NAME }} \
