@@ -16,7 +16,7 @@ COPY HB_Backend/api/ ./
 RUN bunx prisma generate
 
 # Build the application
-RUN bun build src/index.ts --outdir=dist --target=bun --minify
+RUN bun run build
 
 # Production stage
 FROM oven/bun:1-alpine AS runner
@@ -45,6 +45,7 @@ ENV NODE_ENV=development
 ENV PORT=8181
 
 CMD ["bun", "run", "start"]
+
 
 
 
