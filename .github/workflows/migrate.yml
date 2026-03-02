@@ -15,6 +15,7 @@ permissions:
 
 env:
   MIGRATE_IMAGE: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/hb-backend-migrate:latest
+  APP_PORT: 8181
 
 jobs:
   migrate:
@@ -56,4 +57,5 @@ jobs:
         run: |
           docker run --rm \
             -e DATABASE_URL="$DATABASE_URL" \
+            -e PORT=${{ env.APP_PORT }} \
             ${{ env.MIGRATE_IMAGE }}

@@ -13,6 +13,7 @@ env:
   ACR_NAME: hb1b2bdevacr
   RESOURCE_GROUP: rg1-hb1-b2b-dev
   WEBAPP_NAME: hb1-b2b-dev-backend
+  APP_PORT: 8181
 
 jobs:
   build-test-deploy:
@@ -73,6 +74,13 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.WEBAPP_NAME }} \
             --generic-configurations '{"acrUseManagedIdentityCreds": true}'
+
+      - name: Set App Service Port
+        run: |
+          az webapp config appsettings set \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.WEBAPP_NAME }} \
+            --settings PORT=${{ env.APP_PORT }} WEBSITES_PORT=${{ env.APP_PORT }}
 
       - name: Update App Service Container
         run: |
