@@ -16,7 +16,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 const app = new Hono();
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = parseInt(process.env.PORT || '8181', 10);
 
 // Global middleware
 app.use('*', logger());
@@ -57,7 +57,7 @@ setupDocs(app, {
   description: 'API documentation for HB Backend service',
   version: '1.0.0',
   servers: [
-    { url: 'http://localhost:3000', description: 'Local Development' },
+    { url: 'http://localhost:8181', description: 'Local Development' },
   ],
 });
 
@@ -93,5 +93,6 @@ const shutdown = (signal: string) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
 
 
