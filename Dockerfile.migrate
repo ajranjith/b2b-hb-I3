@@ -1,0 +1,15 @@
+# Migration-only image
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies (including dev deps for Prisma CLI)
+COPY HB_Backend/api/package.json ./
+RUN npm install --include=dev
+
+# Include Prisma config and migrations
+COPY HB_Backend/api/prisma ./prisma
+COPY HB_Backend/api/prisma.config.ts ./prisma.config.ts
+
+# Run migrations and exit
+CMD ["npx", "prisma", "migrate", "deploy"]

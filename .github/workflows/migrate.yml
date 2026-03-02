@@ -1,0 +1,59 @@
+name: Backend Migrations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "HB_Backend/**"
+      - "Dockerfile.migrate"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  MIGRATE_IMAGE: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/hb-backend-migrate:latest
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR (OIDC token)
+        run: |
+          TOKEN=$(az acr login \
+            --name ${{ secrets.AZURE_ACR_NAME }} \
+            --expose-token \
+            --output tsv \
+            --query accessToken)
+
+          echo $TOKEN | docker login \
+            ${{ secrets.AZURE_ACR_LOGIN_SERVER }} \
+            --username 00000000-0000-0000-0000-000000000000 \
+            --password-stdin
+
+      - name: Build Migration Image
+        run: docker build -f Dockerfile.migrate -t ${{ env.MIGRATE_IMAGE }} .
+
+      - name: Push Migration Image
+        run: docker push ${{ env.MIGRATE_IMAGE }}
+
+      - name: Run Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          docker run --rm \
+            -e DATABASE_URL="$DATABASE_URL" \
+            ${{ env.MIGRATE_IMAGE }}
