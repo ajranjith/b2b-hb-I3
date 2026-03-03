@@ -75,12 +75,23 @@ jobs:
             --name ${{ env.WEBAPP_NAME }} \
             --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 
-      - name: Set App Service Port
+      - name: Set App Service Settings
         run: |
           az webapp config appsettings set \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.WEBAPP_NAME }} \
-            --settings PORT=${{ env.APP_PORT }} WEBSITES_PORT=${{ env.APP_PORT }}
+            --settings \
+              PORT=${{ env.APP_PORT }} \
+              WEBSITES_PORT=${{ env.APP_PORT }} \
+              AZURE_SSL=true \
+              AZURE_UPLOAD_MAX_CONN=5 \
+              AZURE_CONNECTION_TIMEOUT_SECS=30 \
+              AZURE_URL_EXPIRATION_SECS=none \
+              AZURE_OVERWRITE_FILES=false \
+              AZURE_CACHE_CONTROL=no-cache \
+              AZURE_ACCOUNT_NAME=stghbb2bdev1 \
+              AZURE_ACCOUNT_KEY=${{ secrets.AZURE_ACCOUNT_KEY }} \
+              AZURE_CONTAINER=inbound
 
       - name: Update App Service Container
         run: |
@@ -94,4 +105,5 @@ jobs:
 
       - name: Restart App Service
         run: az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.WEBAPP_NAME }}
+
 
