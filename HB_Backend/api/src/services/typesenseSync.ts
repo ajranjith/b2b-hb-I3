@@ -34,6 +34,27 @@ export async function syncProductsToTypesense(
   onProgress?: (progress: SyncProgress) => void
 ): Promise<SyncResult> {
   const startTime = Date.now();
+
+  if (!typesenseClient) {
+    const message = 'WARN: Typesense disabled. Skipping sync.';
+    console.warn(message);
+    onProgress?.({
+      stage: 'failed',
+      supersededLoaded: 0,
+      productsProcessed: 0,
+      totalProducts: 0,
+      message,
+    });
+    return {
+      success: false,
+      totalProducts: 0,
+      totalSuperseded: 0,
+      newCollection: '',
+      durationMs: 0,
+      error: message,
+    };
+  }
+
   let newCollection = '';
   let oldCollection: string | undefined;
   let totalProducts = 0;
@@ -340,3 +361,4 @@ export async function syncProductsToTypesense(
     };
   }
 }
+

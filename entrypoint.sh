@@ -16,18 +16,26 @@ fi
 echo "DATABASE_URL=***set***"
 
 if [ -z "$TYPESENSE_API_KEY" ]; then
-  echo "TYPESENSE_API_KEY is not set (search disabled)"
+  echo "WARN: TYPESENSE_API_KEY not set. Search disabled."
 else
   echo "TYPESENSE_API_KEY=***set***"
 fi
 
-if [ -n "$TYPESENSE_HOST" ]; then
+if [ -z "$TYPESENSE_HOST" ]; then
+  echo "WARN: TYPESENSE_HOST not set. Search disabled."
+else
   echo "TYPESENSE_HOST=$TYPESENSE_HOST"
 fi
-if [ -n "$TYPESENSE_PORT" ]; then
+
+if [ -z "$TYPESENSE_PORT" ]; then
+  echo "WARN: TYPESENSE_PORT not set. Using default 8108."
+else
   echo "TYPESENSE_PORT=$TYPESENSE_PORT"
 fi
-if [ -n "$TYPESENSE_PROTOCOL" ]; then
+
+if [ -z "$TYPESENSE_PROTOCOL" ]; then
+  echo "WARN: TYPESENSE_PROTOCOL not set. Using default http."
+else
   echo "TYPESENSE_PROTOCOL=$TYPESENSE_PROTOCOL"
 fi
 
@@ -36,6 +44,7 @@ if bunx prisma migrate deploy; then
   echo "Migrations complete."
 else
   echo "Migration failed: exit $?" >&2
+  exit 1
 fi
 
 echo "Starting server..."

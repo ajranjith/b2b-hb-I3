@@ -4,42 +4,42 @@ import Typesense from 'typesense';
  * TypeSense client for search functionality
  */
 const typesenseApiKey = process.env.TYPESENSE_API_KEY;
-const typesenseHost = process.env.TYPESENSE_HOST || 'localhost';
-const typesensePort = parseInt(process.env.TYPESENSE_PORT || '8108');
-const typesenseProtocol = process.env.TYPESENSE_PROTOCOL || 'http';
+const typesenseHost = process.env.TYPESENSE_HOST;
+const typesensePortRaw = process.env.TYPESENSE_PORT;
+const typesenseProtocolRaw = process.env.TYPESENSE_PROTOCOL;
 
-const isTypesenseConfigured = Boolean(typesenseApiKey);
-
-if (!isTypesenseConfigured) {
-  console.warn('TYPESENSE_API_KEY is not set. Search features are disabled.');
+if (!typesenseApiKey) {
+  console.warn('WARN: TYPESENSE_API_KEY not set. Search disabled.');
+}
+if (!typesenseHost) {
+  console.warn('WARN: TYPESENSE_HOST not set. Search disabled.');
+}
+if (!typesensePortRaw) {
+  console.warn('WARN: TYPESENSE_PORT not set. Using default 8108.');
+}
+if (!typesenseProtocolRaw) {
+  console.warn('WARN: TYPESENSE_PROTOCOL not set. Using default http.');
 }
 
-const createUnconfiguredClient = () => {
-  return new Proxy(
-    {},
-    {
-      get() {
-        return () => {
-          throw new Error('Typesense is not configured. Set TYPESENSE_API_KEY to enable search.');
-        };
-      },
-    }
-  ) as Typesense.Client;
-};
+const typesensePort = parseInt(typesensePortRaw || '8108', 10);
+const typesenseProtocol = typesenseProtocolRaw || 'http';
 
-export const typesenseClient = isTypesenseConfigured
-  ? new Typesense.Client({
-      nodes: [
-        {
-          host: typesenseHost,
-          port: typesensePort,
-          protocol: typesenseProtocol,
-        },
-      ],
-      apiKey: typesenseApiKey!,
-      connectionTimeoutSeconds: 10,
-    })
-  : createUnconfiguredClient();
+export const typesenseClient: Typesense.Client | null =
+  typesenseApiKey && typesenseHost
+    ? new Typesense.Client({
+        nodes: [
+          {
+            host: typesenseHost,
+            port: typesensePort,
+            protocol: typesenseProtocol,
+          },
+        ],
+        apiKey: typesenseApiKey,
+        connectionTimeoutSeconds: 10,
+      })
+    : null;
+
+export const isTypesenseEnabled = Boolean(typesenseClient);
 
 /**
  * Products collection schema

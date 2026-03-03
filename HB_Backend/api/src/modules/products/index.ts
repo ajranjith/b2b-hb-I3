@@ -20,6 +20,10 @@ const productsRoutes = new Hono();
  * Update a single product in TypeSense
  */
 async function updateProductInTypesense(productCode: string): Promise<void> {
+  if (!typesenseClient) {
+    console.warn('[TypeSense Update] WARN: Typesense disabled. Skipping update.');
+    return;
+  }
   try {
     // Get current collection name from alias
     const aliasInfo = await typesenseClient.aliases('products').retrieve();
@@ -896,3 +900,4 @@ productsRoutes.put(
 );
 
 export default productsRoutes;
+

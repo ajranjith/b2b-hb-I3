@@ -23,6 +23,18 @@ export async function syncSupersededToTypesense(
 ): Promise<SupersededSyncResult> {
   const startTime = Date.now();
 
+  if (!typesenseClient) {
+    const message = 'WARN: Typesense disabled. Skipping superseded sync.';
+    console.warn(message);
+    return {
+      success: false,
+      affectedProducts: 0,
+      durationMs: 0,
+      error: message,
+    };
+  }
+
+
   try {
     console.log(`[Superseded Sync] Starting incremental sync for ${affectedProductCodes.size} products...`);
 
@@ -174,3 +186,4 @@ export async function syncSupersededToTypesense(
     };
   }
 }
+

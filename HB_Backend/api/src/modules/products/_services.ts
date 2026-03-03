@@ -37,6 +37,11 @@ interface ListProductsResult {
 export async function listProducts(query: ListProductsQuery): Promise<ListProductsResult> {
   const { page, limit, q, type } = query;
 
+  if (!typesenseClient) {
+    console.warn('[Products Service] WARN: Typesense disabled. Returning empty search results.');
+    return { products: [], total: 0 };
+  }
+
   try {
     // Detect if search query is pure numbers
     const isNumericSearch = /^\d+$/.test(q);
@@ -142,6 +147,16 @@ interface ProductCountResult {
 export async function getProductCounts(query: ProductCountQuery): Promise<ProductCountResult> {
   const { q } = query;
 
+  if (!typesenseClient) {
+    console.warn('[Products Service] WARN: Typesense disabled. Returning zero counts.');
+    return {
+      all: 0,
+      aftermarket: 0,
+      genuine: 0,
+      branded: 0,
+    };
+  }
+
   try {
     // Detect if search query is pure numbers
     const isNumericSearch = /^\d+$/.test(q);
@@ -206,3 +221,5 @@ export async function getProductCounts(query: ProductCountQuery): Promise<Produc
     throw error;
   }
 }
+
+
