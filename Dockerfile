@@ -33,6 +33,8 @@ COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Set ownership
 RUN chown -R nodejs:nodejs /app
@@ -44,7 +46,10 @@ EXPOSE 8181
 ENV NODE_ENV=development
 ENV PORT=8181
 
+ENTRYPOINT ["./entrypoint.sh"]
+
 CMD ["bun", "run", "start"]
+
 
 
 

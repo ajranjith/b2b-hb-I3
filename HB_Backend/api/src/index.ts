@@ -20,28 +20,6 @@ if (!process.env.DATABASE_URL) {
 
 const app = new Hono();
 const port = parseInt(process.env.PORT || '8181', 10);
-const shouldRunMigrations = process.env.RUN_MIGRATIONS_ON_STARTUP === 'true';
-
-const runMigrations = async () => {
-  console.log("Running migrations...");
-  const proc = Bun.spawn(["bunx", "prisma", "migrate", "deploy"], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  const exitCode = await proc.exited;
-  if (exitCode !== 0) {
-    throw new Error(`prisma migrate deploy failed with exit code ${exitCode}`);
-  }
-};
-
-if (shouldRunMigrations) {
-  setTimeout(() => {
-    runMigrations().catch((error) => {
-      console.error("Migration failed:", error);
-    });
-  }, 0);
-}
-
 // Global middleware
 app.use('*', logger());
 app.use(
@@ -117,6 +95,7 @@ const shutdown = (signal: string) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
 
 
 

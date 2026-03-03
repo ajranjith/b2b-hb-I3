@@ -4,22 +4,42 @@ import Typesense from 'typesense';
  * TypeSense client for search functionality
  */
 const typesenseApiKey = process.env.TYPESENSE_API_KEY;
+const typesenseHost = process.env.TYPESENSE_HOST || 'localhost';
+const typesensePort = parseInt(process.env.TYPESENSE_PORT || '8108');
+const typesenseProtocol = process.env.TYPESENSE_PROTOCOL || 'http';
 
-if (!typesenseApiKey) {
-  throw new Error('TYPESENSE_API_KEY is not set');
+const isTypesenseConfigured = Boolean(typesenseApiKey);
+
+if (!isTypesenseConfigured) {
+  console.warn('TYPESENSE_API_KEY is not set. Search features are disabled.');
 }
 
-export const typesenseClient = new Typesense.Client({
-  nodes: [
+const createUnconfiguredClient = () => {
+  return new Proxy(
+    {},
     {
-      host: process.env.TYPESENSE_HOST || 'localhost',
-      port: parseInt(process.env.TYPESENSE_PORT || '8108'),
-      protocol: process.env.TYPESENSE_PROTOCOL || 'http',
-    },
-  ],
-  apiKey: typesenseApiKey,
-  connectionTimeoutSeconds: 10,
-});
+      get() {
+        return () => {
+          throw new Error('Typesense is not configured. Set TYPESENSE_API_KEY to enable search.');
+        };
+      },
+    }
+  ) as Typesense.Client;
+};
+
+export const typesenseClient = isTypesenseConfigured
+  ? new Typesense.Client({
+      nodes: [
+        {
+          host: typesenseHost,
+          port: typesensePort,
+          protocol: typesenseProtocol,
+        },
+      ],
+      apiKey: typesenseApiKey!,
+      connectionTimeoutSeconds: 10,
+    })
+  : createUnconfiguredClient();
 
 /**
  * Products collection schema
